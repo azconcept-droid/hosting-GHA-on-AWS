@@ -30,12 +30,30 @@ jobs:
         echo "=== Disk Info ==="
         df -h
         
-    # - name: Test basic commands
-    #   run: |
-    #     echo "Testing basic commands..."
-    #     which git
-    #     which curl
-    #     which docker || echo "Docker not installed"
+    - name: Test basic commands
+      run: |
+        echo "Testing basic commands..."
+        
+        # Check git
+        if command -v git &> /dev/null; then
+          echo "Git is installed: $(git --version)"
+        else
+          echo "Git is NOT installed"
+        fi
+        
+        # Check curl
+        if command -v curl &> /dev/null; then
+          echo "Curl is installed: $(curl --version | head -1)"
+        else
+          echo "Curl is NOT installed"
+        fi
+        
+        # Check docker
+        if command -v docker &> /dev/null; then
+          echo "Docker is installed: $(docker --version)"
+        else
+          echo "Docker is NOT installed"
+        fi
         
     - name: Simple computation test
       run: |
