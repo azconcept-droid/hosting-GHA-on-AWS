@@ -30,12 +30,12 @@ jobs:
         echo "=== Disk Info ==="
         df -h
         
-    - name: Test basic commands
-      run: |
-        echo "Testing basic commands..."
-        which git
-        which curl
-        which docker || echo "Docker not installed"
+    # - name: Test basic commands
+    #   run: |
+    #     echo "Testing basic commands..."
+    #     which git
+    #     which curl
+    #     which docker || echo "Docker not installed"
         
     - name: Simple computation test
       run: |
