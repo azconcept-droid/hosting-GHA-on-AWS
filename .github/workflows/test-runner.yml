@@ -1,0 +1,46 @@
+name: Test Self-Hosted Runner
+
+on:
+  workflow_dispatch:  # Allows manual triggering
+  push:
+    branches: [ main ]
+
+jobs:
+  test-runner:
+    runs-on: self-hosted  # This tells GitHub to use your runner
+    
+    steps:
+    - name: Check runner info
+      run: |
+        echo "Runner name: $RUNNER_NAME"
+        echo "Runner OS: $RUNNER_OS"
+        echo "Runner architecture: $RUNNER_ARCH"
+        echo "Hostname: $(hostname)"
+        echo "Current user: $(whoami)"
+        echo "Working directory: $(pwd)"
+        
+    - name: System information
+      run: |
+        echo "=== System Info ==="
+        uname -a
+        echo "=== CPU Info ==="
+        cat /proc/cpuinfo | grep "model name" | head -1
+        echo "=== Memory Info ==="
+        free -h
+        echo "=== Disk Info ==="
+        df -h
+        
+    - name: Test basic commands
+      run: |
+        echo "Testing basic commands..."
+        which git
+        which curl
+        which docker || echo "Docker not installed"
+        
+    - name: Simple computation test
+      run: |
+        echo "Testing computation..."
+        for i in {1..5}; do
+          echo "Iteration $i: $(date)"
+          sleep 1
+        done
