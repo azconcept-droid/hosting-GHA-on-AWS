@@ -8,8 +8,13 @@ on:
 jobs:
   test-runner:
     runs-on: self-hosted  # This tells GitHub to use your runner
-    
     steps:
+    - name: install Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 20
+    - run: node -v
+  
     - name: Check runner info
       run: |
         echo "Runner name: $RUNNER_NAME"
