@@ -1,0 +1,140 @@
+name: Deploy to Private Servers via Bastion
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Run build
+    runs-on: ubuntu-22.04
+    steps:
+      - run: echo "skipping build steps..."
+
+  deploy:
+    runs-on: self-hosted  # This tells GitHub to use your runner
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup SSH Keys and Config
+      run: |
+        # Create SSH directory
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+        
+        # Add bastion SSH key
+        echo "${{ secrets.BASTION_SSH_KEY }}" > ~/.ssh/bastion_key
+        chmod 600 ~/.ssh/bastion_key
+        
+        # Add servers SSH key  
+        echo "${{ secrets.SERVERS_SSH_KEY }}" > ~/.ssh/servers_key
+        chmod 600 ~/.ssh/servers_key
+        
+        # Create SSH config for bastion and servers
+        cat > ~/.ssh/config << EOF
+        Host bastion
+            HostName ${{ secrets.BASTION_HOST }}
+            User ${{ secrets.BASTION_USER }}
+            IdentityFile ~/.ssh/bastion_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            
+        Host server1
+            HostName 10.0.1.5
+            User ${{ secrets.SERVERS_USER }}
+            ProxyJump bastion
+            IdentityFile ~/.ssh/servers_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            
+        Host server2
+            HostName 10.0.1.6
+            User ${{ secrets.SERVERS_USER }}
+            ProxyJump bastion
+            IdentityFile ~/.ssh/servers_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            
+        Host server3
+            HostName 10.0.1.7
+            User ${{ secrets.SERVERS_USER }}
+            ProxyJump bastion
+            IdentityFile ~/.ssh/servers_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            
+        Host server4
+            HostName 10.0.1.8
+            User ${{ secrets.SERVERS_USER }}
+            ProxyJump bastion
+            IdentityFile ~/.ssh/servers_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            
+        Host server5
+            HostName 10.0.1.9
+            User ${{ secrets.SERVERS_USER }}
+            ProxyJump bastion
+            IdentityFile ~/.ssh/servers_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+        EOF
+        
+        chmod 600 ~/.ssh/config
+
+    - name: Test SSH Connections
+      run: |
+        # Test bastion connection
+        ssh bastion 'echo "Bastion connection successful"'
+        
+        # Test all server connections
+        for i in {1..5}; do
+          echo "Testing connection to server$i..."
+          ssh server$i 'echo "Server '$i' connection successful"'
+        done
+
+    - name: Deploy to All Servers
+      run: |
+        # Define server hostnames
+        SERVERS=("server1" "server2" "server3" "server4" "server5")
+        
+        # Deploy to each server
+        for server in "${SERVERS[@]}"; do
+          echo "Deploying to $server..."
+          
+          # Example: Copy files and run deployment commands
+          scp -r ./app $server:/tmp/
+          
+          ssh $server << 'EOF'
+            # Your deployment commands here
+            cd /tmp/app
+            sudo systemctl stop myapp || true
+            sudo cp -r . /opt/myapp/
+            sudo systemctl start myapp
+            sudo systemctl enable myapp
+            echo "Deployment completed on $(hostname)"
+          EOF
+        done
+
+    - name: Parallel Deployment (Alternative)
+      run: |
+        # Run commands on all servers in parallel
+        for i in {1..5}; do
+          (
+            echo "Starting deployment on server$i"
+            ssh server$i << 'EOF'
+              # Your deployment commands
+              whoami
+              hostname
+              uptime
+              # Add your actual deployment logic here
+            EOF
+            echo "Completed deployment on server$i"
+          ) &
+        done
+        
+        # Wait for all background jobs to complete
+        wait
+        echo "All deployments completed"
