@@ -13,23 +13,23 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Setup SSH Configuration
-      run: |
-        mkdir -p ~/.ssh
-        cat > ~/.ssh/config << EOF
-        Host server1
-            HostName ${{ secrets.SERVER1_PRIV_IP }}
-            User ${{ secrets.SERVERS_USER }}
-            IdentityFile ~/.ssh/servers_key
-            StrictHostKeyChecking no
+    # - name: Setup SSH Configuration
+    #   run: |
+    #     mkdir -p ~/.ssh
+    #     cat > ~/.ssh/config << EOF
+    #     Host server1
+    #         HostName ${{ secrets.SERVER1_PRIV_IP }}
+    #         User ${{ secrets.SERVERS_USER }}
+    #         IdentityFile ~/.ssh/servers_key
+    #         StrictHostKeyChecking no
             
-        Host server2
-            HostName ${{ secrets.SERVER2_PRIV_IP }}
-            User ${{ secrets.SERVERS_USER }}
-            IdentityFile ~/.ssh/servers_key
-            StrictHostKeyChecking no
-        EOF
-        chmod 600 ~/.ssh/config
+    #     Host server2
+    #         HostName ${{ secrets.SERVER2_PRIV_IP }}
+    #         User ${{ secrets.SERVERS_USER }}
+    #         IdentityFile ~/.ssh/servers_key
+    #         StrictHostKeyChecking no
+    #     EOF
+    #     chmod 600 ~/.ssh/config
 
     - name: Test Connectivity
       run: |
