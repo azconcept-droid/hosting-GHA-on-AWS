@@ -39,8 +39,6 @@ jobs:
         run: |
           command -v ssh-agent >/dev/null || ( apt update && apt install -y openssh-client )
           install -m 600 -D /dev/null ~/.ssh/known_hosts
-          echo "Host ${{ secrets.SSH_HOST }}
-            StrictHostKeyChecking no" >> ~/.ssh/config
 
       - name: Run Deploy
         run: |
