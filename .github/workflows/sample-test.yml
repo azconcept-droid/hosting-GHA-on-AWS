@@ -33,7 +33,7 @@ jobs:
 
   deploy:
     name: Deploy frontend
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted
     steps:
       - name: Configure SSH
         run: |
@@ -46,7 +46,7 @@ jobs:
         run: |
           eval $(ssh-agent -s) && \
           ssh-add <(echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d) && \
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
+          ssh server1 \
           export PATH=$PATH:${{ secrets.NVM_PATH }} && \
           cd /opt/app/testing/ncdf-frontend-vanilla && \
           git fetch --prune origin && \
