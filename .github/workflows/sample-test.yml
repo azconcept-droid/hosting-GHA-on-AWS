@@ -45,7 +45,6 @@ jobs:
       - name: Run Deploy
         run: |
           eval $(ssh-agent -s) && \
-          ssh-add <(echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d) && \
           ssh server1 "\
           export PATH=$PATH:${{ secrets.NVM_PATH }} && \
           cd /opt/app/testing/ncdf-frontend-vanilla && \
@@ -57,7 +56,6 @@ jobs:
           npm run build && \
           pm2 reload ncdf-fe-uat && \
           exit" && \
-          eval $(ssh-add -D)
 
       - name: Cleanup
         run: rm -rf ~/.ssh
