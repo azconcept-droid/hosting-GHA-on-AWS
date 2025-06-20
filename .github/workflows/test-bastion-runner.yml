@@ -18,13 +18,13 @@ jobs:
         mkdir -p ~/.ssh
         cat > ~/.ssh/config << EOF
         Host server1
-            HostName 172.31.80.197
+            HostName ${{ secrets.SERVER1_PRIV_IP }}
             User ${{ secrets.SERVERS_USER }}
             IdentityFile ~/.ssh/servers_key
             StrictHostKeyChecking no
             
         Host server2
-            HostName 172.31.93.16
+            HostName ${{ secrets.SERVER2_PRIV_IP }}
             User ${{ secrets.SERVERS_USER }}
             IdentityFile ~/.ssh/servers_key
             StrictHostKeyChecking no
