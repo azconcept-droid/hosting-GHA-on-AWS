@@ -1,0 +1,61 @@
+on:
+  push:
+    branches:
+      - "staging"
+  workflow_dispatch:
+
+name: Deploy to test server | staging
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: echo "skipping test steps..."
+
+  build:
+    name: Run build
+    runs-on: ubuntu-22.04
+    steps:
+      - run: echo "skipping build steps..."
+
+  deploy:
+    name: Deploy frontend
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Configure SSH
+        run: |
+          command -v ssh-agent >/dev/null || ( apt update && apt install -y openssh-client )
+          install -m 600 -D /dev/null ~/.ssh/known_hosts
+          echo -n "${{ secrets.KNOWN_HOSTS }}" | base64 -d > ~/.ssh/known_hosts
+
+      - name: Run Deploy
+        run: |
+          eval $(ssh-agent -s) && \
+          ssh-add <(echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d) && \
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
+          export PATH=$PATH:${{ secrets.NVM_PATH }} && \
+          cd /opt/app/staging/ncdf-frontend-vanilla && \
+          git fetch && \
+          git reset --hard && \
+          git checkout ${{ github.base_ref || github.ref_name }} && \
+          git pull && \
+          npm install && \
+          npm run build && \
+          pm2 reload ncdf-fe-staging && \
+          exit" && \
+          eval $(ssh-add -D)
+
+      - name: Cleanup
+        run: rm -rf ~/.ssh
