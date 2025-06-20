@@ -1,0 +1,36 @@
+on:
+  push:
+    branches:
+      - production
+  workflow_dispatch:
+    inputs:
+      deploy_all:
+        description: 'Deploy all services'
+        required: false
+        default: 'true'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch full history
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_PROD }}
+
+      - name: Deploy to Production
+        run: |
+          ssh -p ${{ secrets.SSH_PORT_PROD }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER_PROD }}@${{ secrets.SSH_HOST_PROD }} << 'EOF'
+            source ~/.bashrc
+            cd ${{ secrets.WORKING_DIR_PROD }}
+            git pull origin production
+            npm install
+            npm run build
+            pm2 reload ../ncdf.ecosystem.config.js
+          EOF
