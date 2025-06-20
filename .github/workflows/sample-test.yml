@@ -46,7 +46,7 @@ jobs:
         run: |
           eval $(ssh-agent -s) && \
           ssh-add <(echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d) && \
-          ssh server1 \
+          ssh server1 "\
           export PATH=$PATH:${{ secrets.NVM_PATH }} && \
           cd /opt/app/testing/ncdf-frontend-vanilla && \
           git fetch --prune origin && \
