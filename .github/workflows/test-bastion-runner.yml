@@ -34,14 +34,14 @@ jobs:
     - name: Test Connectivity
       run: |
         echo "Testing connections to all servers..."
-        for i in {1..5}; do
+        for i in {1..2}; do
           echo "Testing server$i..."
           ssh server$i 'echo "✅ $(hostname) is reachable"'
         done
 
     - name: Deploy to All Servers
       run: |
-        SERVERS=("server1" "server2" "server3" "server4" "server5")
+        SERVERS=("server1" "server2")
         
         for server in "${SERVERS[@]}"; do
           echo "🚀 Deploying to $server..."
