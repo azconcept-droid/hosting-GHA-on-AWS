@@ -1,0 +1,53 @@
+name: Branch-based CI/CD
+
+on:
+  push:
+    branches: ['*']
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up kubectl
+        run: |
+          # kubectl is already available in the runner pod
+          kubectl version --client
+      
+      - name: Deploy based on branch
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          SANITIZED_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9-]/-/g' | tr '[:lower:]')
+          
+          echo "Deploying branch: $BRANCH_NAME"
+          
+          # Create namespace
+          kubectl create namespace "branch-$SANITIZED_BRANCH" --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Deploy your application
+          kubectl apply -f - <<EOF
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: app-$SANITIZED_BRANCH
+            namespace: branch-$SANITIZED_BRANCH
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: myapp
+                branch: $SANITIZED_BRANCH
+            template:
+              metadata:
+                labels:
+                  app: myapp
+                  branch: $SANITIZED_BRANCH
+              spec:
+                containers:
+                - name: app
+                  image: nginx:latest  # Replace with your image
+                  ports:
+                  - containerPort: 80
+          EOF

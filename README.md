@@ -19,3 +19,11 @@ Hosting github action on AWS EC2
 
   ### Install Helm
 
+  ### install arc (Actions runner controller)
+  Run arc-install.sh script
+  ```
+  bash ./setup/arc-install.sh
+  ```
+
+  ### git hub secret if using PAT
+

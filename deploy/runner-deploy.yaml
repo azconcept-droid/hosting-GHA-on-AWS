@@ -1,0 +1,25 @@
+apiVersion: actions.sumologic.com/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: github-runner
+  namespace: actions-runner-system
+spec:
+  replicas: 2
+  template:
+    spec:
+      repository: your-username/your-repo
+      
+      # Using PAT (simpler setup)
+      tokenSecret:
+        secretName: github-token
+        key: token
+      
+      image: sumologic/actions-runner:latest
+      dockerdWithinRunnerContainer: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
