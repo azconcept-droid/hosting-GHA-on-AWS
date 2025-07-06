@@ -1,0 +1,13 @@
+name: Test Self-Hosted Runner
+on: [push]
+
+jobs:
+  test:
+    runs-on: [self-hosted, linux, x64]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test runner
+        run: |
+          echo "Running on self-hosted runner"
+          hostname
+          docker --version
