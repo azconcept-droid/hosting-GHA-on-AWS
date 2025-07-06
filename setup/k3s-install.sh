@@ -11,4 +11,6 @@ curl -sfL https://get.k3s.io |  INSTALL_K3S_VERSION=<VERSION> sh -s - server \
   --token "<MAIN_SERVER_NODE_TOKEN>"
 
 sudo k3s kubectl get nodes
+# AMAZON LINUX INSTALLATION
+curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_SELINUX_RPM=true sh -
 
