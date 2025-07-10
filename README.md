@@ -23,7 +23,7 @@ Actions Runner Controller (ARC) is a Kubernetes operator that orchestrates and s
 ARC requires these specific permissions:
 
 **Repository permissions:**
-- **Actions**: Read (to access workflow runs)
+- **Actions**: Read and write(to access workflow runs)
 - **Administration**: Read (to manage runners)
 - **Checks**: Read (to access check runs)
 - **Contents**: Read (to access repository content)
